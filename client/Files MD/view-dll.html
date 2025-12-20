@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>users</title>
+  <style>
+    /* From extension vscode.github */
+    /*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+    .vscode-dark img[src$=\#gh-light-mode-only],
+    .vscode-light img[src$=\#gh-dark-mode-only],
+    .vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+    .vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+      display: none;
+    }
+  </style>
+
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+  </style>
+  <style>
+    .task-list-item {
+      list-style-type: none;
+    }
+
+    .task-list-item-checkbox {
+      margin-left: -20px;
+      vertical-align: middle;
+      pointer-events: none;
+    }
+  </style>
+  <style>
+    :root {
+      --color-note: #0969da;
+      --color-tip: #1a7f37;
+      --color-warning: #9a6700;
+      --color-severe: #bc4c00;
+      --color-caution: #d1242f;
+      --color-important: #8250df;
+    }
+  </style>
+  <style>
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-note: #2f81f7;
+        --color-tip: #3fb950;
+        --color-warning: #d29922;
+        --color-severe: #db6d28;
+        --color-caution: #f85149;
+        --color-important: #a371f7;
+      }
+    }
+  </style>
+  <style>
+    .markdown-alert {
+      padding: 0.5rem 1rem;
+      margin-bottom: 16px;
+      color: inherit;
+      border-left: .25em solid #888;
+    }
+
+    .markdown-alert>:first-child {
+      margin-top: 0
+    }
+
+    .markdown-alert>:last-child {
+      margin-bottom: 0
+    }
+
+    .markdown-alert .markdown-alert-title {
+      display: flex;
+      font-weight: 500;
+      align-items: center;
+      line-height: 1
+    }
+
+    .markdown-alert .markdown-alert-title .octicon {
+      margin-right: 0.5rem;
+      display: inline-block;
+      overflow: visible !important;
+      vertical-align: text-bottom;
+      fill: currentColor;
+    }
+
+    .markdown-alert.markdown-alert-note {
+      border-left-color: var(--color-note);
+    }
+
+    .markdown-alert.markdown-alert-note .markdown-alert-title {
+      color: var(--color-note);
+    }
+
+    .markdown-alert.markdown-alert-important {
+      border-left-color: var(--color-important);
+    }
+
+    .markdown-alert.markdown-alert-important .markdown-alert-title {
+      color: var(--color-important);
+    }
+
+    .markdown-alert.markdown-alert-warning {
+      border-left-color: var(--color-warning);
+    }
+
+    .markdown-alert.markdown-alert-warning .markdown-alert-title {
+      color: var(--color-warning);
+    }
+
+    .markdown-alert.markdown-alert-tip {
+      border-left-color: var(--color-tip);
+    }
+
+    .markdown-alert.markdown-alert-tip .markdown-alert-title {
+      color: var(--color-tip);
+    }
+
+    .markdown-alert.markdown-alert-caution {
+      border-left-color: var(--color-caution);
+    }
+
+    .markdown-alert.markdown-alert-caution .markdown-alert-title {
+      color: var(--color-caution);
+    }
+  </style>
+
+</head>
+
+<body dir="rtl" class="vscode-body vscode-light">
+  <h2 id="users">users</h2>
+  <ol>
+    <li>מטרה: טבלת משתמשי השרת – זהות, הרשאות (role), סטטוס פעילות, וסיסמה מוצפנת (hash).</li>
+    <li>נכתבת ב: Register, עדכון פרופיל/הרשאות ע״י ADMIN, עדכון <code>last_login_at</code> בעת Login.</li>
+    <li>נקראת ב: Login, בדיקות הרשאה (RBAC) לכל בקשה, ניהול משתמשים, ולוגים/רישום פעולות (דרך FK בטבלאות אחרות).</li>
+    <li>חובה/אופציונלית: <strong>חובה</strong>.</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>. רלוונטית בכל מצב.</li>
+  </ol>
+  <h2 id="refresh_tokens">refresh_tokens</h2>
+  <ol>
+    <li>מטרה: ניהול Refresh Tokens (hash + תוקף + revoke) לסשנים של Credentials+JWT.</li>
+    <li>נכתבת ב: Login (יצירה), Refresh (רוטציה/יצירה + revoke לקודם), Logout (revoke), ניקוי/סגירה למשתמש מושבת.</li>
+    <li>נקראת ב: Refresh flow (ולידציה), בדיקות אבטחה/סשנים, תחקור תקריות.</li>
+    <li>חובה/אופציונלית: <strong>חובה</strong> לפי החלטת AUTH.</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>.</li>
+  </ol>
+  <h2 id="device_type">device_type</h2>
+  <ol>
+    <li>מטרה: מילון סוגי מכשיר (RADIO/ZIAD/MOBILITY/OTHER) לשיוך חובה לכל מכשיר.</li>
+    <li>נכתבת ב: ניהול מערכת (Admin seed/maintenance).</li>
+    <li>נקראת ב: תהליך ייבוא (נגזרת סוג), מסכי סינון/דוחות, חישובי כשירות (אזהרות/לוגיקה עקיפה).</li>
+    <li>חובה/אופציונלית: <strong>חובה</strong> (כי <code>core_device.device_type_id</code> NOT NULL).</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>; רלוונטית לייבוא קובץ בלבד.</li>
+  </ol>
+  <h2 id="device_type_mapping">device_type_mapping</h2>
+  <ol>
+    <li>מטרה: חוקים לקביעת <code>device_type</code> אוטומטית לפי <code>makat</code> (exact) או <code>device_name</code>
+      (contains) עם priority.</li>
+    <li>נכתבת ב: ניהול מערכת (Admin מגדיר חוקים/עדיפויות).</li>
+    <li>נקראת ב: Flow הייבוא (mapping), כלי תחקור/QA של ייבוא.</li>
+    <li>חובה/אופציונלית: <strong>חובה תפקודית</strong> כדי להפיק <code>device_type</code> אוטומטית; גם אם ריק, המערכת
+      עדיין חייבת לעבוד עם ברירת מחדל OTHER (אבל החוקים עצמם הם כלי תפעולי חשוב).</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>; נועדה לייבוא קובץ.</li>
+  </ol>
+  <h2 id="encryption_profile">encryption_profile</h2>
+  <ol>
+    <li>מטרה: “הצפנה צפויה” לפי device_family (כר/סימול/תקופה) וכללי period_mode, לשימוש בבדיקות כשירות.</li>
+    <li>נכתבת ב: ניהול מערכת (Admin מגדיר פרופילים).</li>
+    <li>נקראת ב: חישובי כשירות (ENCRYPTION_MISMATCH / PERIOD_MISMATCH), תצוגה בכרטיס מכשיר.</li>
+    <li>חובה/אופציונלית: <strong>אופציונלית סכמתית</strong> (FK ב־<code>core_device</code> nullable), אבל
+      <strong>מהותית</strong> אם הכשירות תלויה בבדיקות הצפנה.</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>; רלוונטית גם בלי SAP חי (כי אין).</li>
+  </ol>
+  <h2 id="tag">tag</h2>
+  <ol>
+    <li>מטרה: מילון תגיות גלובלי (lowercase policy) לסיווג מהיר של מכשירים.</li>
+    <li>נכתבת ב: UI (יצירת תג), Admin (ניהול).</li>
+    <li>נקראת ב: סינון/דוחות/חיפוש לפי תגיות.</li>
+    <li>חובה/אופציונלית: <strong>אופציונלית</strong> (שכבת ארגון).</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>.</li>
+  </ol>
+  <h2 id="import_error_code">import_error_code</h2>
+  <ol>
+    <li>מטרה: טבלת lookup לקודי שגיאות ייבוא (מוגדרים מראש).</li>
+    <li>נכתבת ב: תהליך Seed/ניהול מערכת (הזנת הקודים).</li>
+    <li>נקראת ב: Flow הייבוא (שגיאות), UI של דו״חות ייבוא.</li>
+    <li>חובה/אופציונלית: <strong>חובה</strong> כדי לרשום שגיאות לפי spec (import_row_error FK).</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>; רלוונטית לייבוא קובץ.</li>
+  </ol>
+  <h2 id="core_device">core_device</h2>
+  <ol>
+    <li>מטרה: טבלת הליבה של המכשירים – זהות (serial), פרטים שמגיעים מהייבוא, שיוך סוג מכשיר, סטטוס מחזור חיים.</li>
+    <li>נכתבת ב: Flow הייבוא (upsert לפי serial; עדכון makat/device_name/current_unit_symbol), ו-UI/תהליכים תפעוליים
+      שמעדכנים lifecycle_status (לפי המוצר).</li>
+    <li>נקראת ב: כל מסכי המערכת (רשימות/כרטיס), חישובי כשירות, דוחות, אימותים בהעלאות/תיוג/קבצים.</li>
+    <li>חובה/אופציונלית: <strong>חובה</strong> (זה הבסיס).</li>
+    <li>תלות SAP: <strong>לא</strong>. השדות “SAP” מגיעים מקובץ; אין SAP API חי.</li>
+  </ol>
+  <h2 id="device_manual">device_manual</h2>
+  <ol>
+    <li>מטרה: “כרטיס ידני” שלא נדרס ע״י ייבוא – שדות סוללה/הצפנה בפועל/notes + override לתצוגת כשירות.</li>
+    <li>נכתבת ב: UI עריכה ידנית, תהליך override set/clear.</li>
+    <li>נקראת ב: כרטיס מכשיר, חישובי כשירות (סוללה/הצפנה בפועל, ועוד), תצוגת override.</li>
+    <li>חובה/אופציונלית: <strong>אופציונלית</strong> (אבל מאוד שימושית/מרכזית לתפעול; המערכת עדיין יכולה לעבוד בלי
+      נתונים ידניים).</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>.</li>
+  </ol>
+  <h2 id="import_batch">import_batch</h2>
+  <ol>
+    <li>מטרה: ריצת ייבוא אחת (CSV/XLSX) כולל exported_at (זמן ייצוא הקובץ) ומדדי דו״ח (counts).</li>
+    <li>נכתבת ב: Flow הייבוא (ידני/מתוזמן) – יצירה בתחילת ריצה, עדכון counts בסיום.</li>
+    <li>נקראת ב: מסך היסטוריית ייבוא, דוחות, תחקור שגיאות, מעקב תפעולי.</li>
+    <li>חובה/אופציונלית: <strong>חובה</strong> לפי Spec (כי יש דרישות דו״ח ייבוא וספירות).</li>
+    <li>תלות SAP: <strong>לא</strong>. מותאמת לייבוא קובץ בלבד (וזה המצב שלך).</li>
+  </ol>
+  <h2 id="sap_snapshot">sap_snapshot</h2>
+  <ol>
+    <li>מטרה: צילום שורת נתוני הייבוא כפי שנקלטו (serial/makat/name/qty/unit_symbol + optional location/holder/status),
+      כולל exported_at כפי שמופיע בשורה (אם קיים).</li>
+    <li>נכתבת ב: Flow הייבוא (parse/normalize) עבור כל שורה.</li>
+    <li>נקראת ב: כרטיס מכשיר (תצוגת נתוני ייבוא), תחקור ייבוא, בדיקות איכות נתונים, דוחות.</li>
+    <li>חובה/אופציונלית: <strong>חובה</strong> לפי Spec (שמירה של נתוני ייבוא ומידע לשחזור/תחקור).</li>
+    <li>תלות SAP: <strong>לא</strong>. למרות השם “sap_”, היא רלוונטית לחלוטין לייבוא קובץ בלבד. אין כאן אינטגרציה חיה.
+    </li>
+  </ol>
+  <h2 id="eligibility_result">eligibility_result</h2>
+  <ol>
+    <li>מטרה: תוצאת חישוב כשירות למכשיר בזמן נתון (computed_at, eligible, summary, מי חישב).</li>
+    <li>נכתבת ב: Flow Recalculate (ידני או מתוזמן), ולעתים לאחר ייבוא אם כך מוגדר ב-flow.</li>
+    <li>נקראת ב: דשבורד/רשימות, כרטיס מכשיר, דוחות והתראות.</li>
+    <li>חובה/אופציונלית: <strong>אופציונלית</strong> (אם לא מפעילים מודול כשירות, אפשר בלעדיה), אך לפי ה-Spec זה רכיב
+      ליבה של המערכת – בפועל <strong>נחשבת חובה פונקציונלית</strong>.</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>.</li>
+  </ol>
+  <h2 id="audit_log">audit_log</h2>
+  <ol>
+    <li>מטרה: Audit trail של פעולות/שינויים במערכת עם diff_json (מאושר) לתחקור ובקרה.</li>
+    <li>נכתבת ב: כל flow שמבצע שינוי משמעותי (ייבוא, עריכות ידניות, overrides, ניהול חוקים/תגיות/קבצים, ניהול משתמשים).
+    </li>
+    <li>נקראת ב: מסך Audit, תחקור אירועים, ביקורות אבטחה/משילות.</li>
+    <li>חובה/אופציונלית: <strong>לרוב חובה במערכת קריטית</strong>; לפי Spec/Appendix היא מוגדרת כרכיב נדרש של audit.
+    </li>
+    <li>תלות SAP: <strong>לא תלויה</strong>.</li>
+  </ol>
+  <h2 id="device_override_history">device_override_history</h2>
+  <ol>
+    <li>מטרה: היסטוריית overrides (FORCE_ELIGIBLE / FORCE_NOT_ELIGIBLE) עם מי/מתי/סיבה.</li>
+    <li>נכתבת ב: Flow override set/clear (במקביל לעדכון device_manual).</li>
+    <li>נקראת ב: כרטיס מכשיר (היסטוריה), תחקור וביקורת.</li>
+    <li>חובה/אופציונלית: <strong>אופציונלית</strong>, אבל נדרשת אם רוצים היסטוריה לפי החלטה שננעלה.</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>.</li>
+  </ol>
+  <h2 id="device_attachment">device_attachment</h2>
+  <ol>
+    <li>מטרה: מטאדאטה של קבצים מצורפים למכשיר (storage_key, checksum, soft-delete).</li>
+    <li>נכתבת ב: Upload/Attach flow, מחיקה לוגית (is_deleted).</li>
+    <li>נקראת ב: כרטיס מכשיר (רשימת קבצים), תחקור/audit.</li>
+    <li>חובה/אופציונלית: <strong>אופציונלית</strong> (אם לא משתמשים בצירופים).</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>.</li>
+  </ol>
+  <h2 id="device_tag">device_tag</h2>
+  <ol>
+    <li>מטרה: קשר many-to-many בין מכשירים לתגיות + מי יצר ומתי.</li>
+    <li>נכתבת ב: UI תיוג מכשיר, כלים תפעוליים.</li>
+    <li>נקראת ב: סינון/חיפוש/דוחות לפי תגיות.</li>
+    <li>חובה/אופציונלית: <strong>אופציונלית</strong> (תלוי שימוש בתגיות).</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>.</li>
+  </ol>
+  <h2 id="sap_snapshot_raw_column">sap_snapshot_raw_column</h2>
+  <ol>
+    <li>מטרה: שמירת עמודות נוספות מהקובץ (מעבר למינימום), כ-raw per snapshot, בלי להשפיע על מודל ליבה.</li>
+    <li>נכתבת ב: Import parse כאשר קיימות עמודות extra.</li>
+    <li>נקראת ב: תחקור/QA של ייבוא, תצוגה “Raw columns” בכרטיס/דוח.</li>
+    <li>חובה/אופציונלית: <strong>אופציונלית</strong> (אם לא נדרשות עמודות נוספות).</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>; רלוונטית במיוחד לייבוא קובץ.</li>
+  </ol>
+  <h2 id="import_row_error">import_row_error</h2>
+  <ol>
+    <li>מטרה: שגיאות ייבוא ברמת שורה (row_number, serial אם קיים, error_code, message).</li>
+    <li>נכתבת ב: Flow validate/normalize של הייבוא.</li>
+    <li>נקראת ב: דו״חות ייבוא, ניהול תקלות, שיפור mapping/rules.</li>
+    <li>חובה/אופציונלית: <strong>חובה</strong> לפי דרישות דו״ח הייבוא.</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>; רלוונטית לייבוא קובץ.</li>
+  </ol>
+  <h2 id="eligibility_reason">eligibility_reason</h2>
+  <ol>
+    <li>מטרה: פירוט חסמים/אזהרות (BLOCK/WARN) עבור eligibility_result ללא JSON, עם ייחודיות לתוצאה.</li>
+    <li>נכתבת ב: Eligibility engine בעת חישוב.</li>
+    <li>נקראת ב: UI (פירוט סיבות), דוחות ותחקור.</li>
+    <li>חובה/אופציונלית: <strong>אופציונלית יחד עם מודול הכשירות</strong>, אך נדרשת אם משתמשים ב-eligibility_result לפי
+      Spec.</li>
+    <li>תלות SAP: <strong>לא תלויה</strong>.</li>
+  </ol>
+  <pre><code class="language-md">=== SUMMARY<span class="hljs-emphasis">_MD ===
+
+# convo-summary.md
+
+## Date + Version
+
+- Date: 2025-12-16
+- Version: Full project DDL locked (Spec v1.0 + Appendices A–F locked + AUTH locked)
+
+## What changed
+
+- DB walkthrough delivered: table-by-table purpose, write flows, read flows, required vs optional, and SAP relevance clarified for file-import-only environment.
+
+## Artifacts
+
+- Documentation-only output: DB walkthrough of tables (no code generated).
+
+## Open Questions
+
+- None raised in this walkthrough step.
+
+## Next Steps
+
+1. Map each backend endpoint/cron flow to the exact tables it touches (write/read) for implementation checklist.
+2. Define operational runbooks: import schedule, eligibility recalculation schedule, and audit review process.
+3. Proceed to API design walkthrough aligned to the DB entities and flows.
+
+## Copy-paste links/refs
+
+- Tables: users, refresh_</span>tokens, device<span class="hljs-emphasis">_type, device_</span>type<span class="hljs-emphasis">_mapping, encryption_</span>profile, tag, import<span class="hljs-emphasis">_error_</span>code, core<span class="hljs-emphasis">_device, device_</span>manual, import<span class="hljs-emphasis">_batch, sap_</span>snapshot, eligibility<span class="hljs-emphasis">_result, audit_</span>log, device<span class="hljs-emphasis">_override_</span>history, device<span class="hljs-emphasis">_attachment, device_</span>tag, sap<span class="hljs-emphasis">_snapshot_</span>raw<span class="hljs-emphasis">_column, import_</span>row<span class="hljs-emphasis">_error, eligibility_</span>reason
+</code></pre>
+
+
+
+</body>
+
+</html>
